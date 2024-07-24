@@ -1,0 +1,4 @@
+node_modules
+lib
+.envrc-private
+annotations.csv

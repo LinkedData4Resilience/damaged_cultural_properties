@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "Preserve", // Change to "commonjs" if you encounter issues with nodenext
+    "moduleResolution": "Bundler", // Change to "node" if you encounter issues with nodenext
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "lib"
+  },
+  "include": ["src"],
+  "compileOnSave": true
+}
