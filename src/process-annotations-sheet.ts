@@ -135,6 +135,9 @@ export async function processAnnotationsSheet(ds: Dataset) {
                     const location = row['Geo location'];
                     if (location) {
                         const [y, x] = location.split(',').map(parseFloat);
+                        if (isNaN(y) || isNaN(x) || !y || !x){
+                            problem(`Problematic coordinate: (${x}, ${y})\n  Based on string "${location}"\n  IRI: ${csIri.value}`);
+                        }
                         if (x < 22.0856083513) {
                             problem(`Location is west of Ukraine: ${location}`)
                         }
@@ -147,7 +150,9 @@ export async function processAnnotationsSheet(ds: Dataset) {
                         if (y > 52.3350745713) {
                             problem(`Location is north of Ukraine: ${location}`)
                         }
-                        addQuad(namedNode(`http://www.opengis.net/ont/geosparql#asWKT`), literal(`POINT(${x} ${y})`, namedNode('http://www.opengis.net/ont/geosparql#wktLiteral')))
+                        if (x && y){
+                            addQuad(namedNode(`http://www.opengis.net/ont/geosparql#asWKT`), literal(`POINT(${x.toFixed(10)} ${y.toFixed(10)})`, namedNode('http://www.opengis.net/ont/geosparql#wktLiteral')))
+                        }
                     }
                 }
 
