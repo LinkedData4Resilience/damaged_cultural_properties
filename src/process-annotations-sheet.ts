@@ -81,7 +81,7 @@ export async function processAnnotationsSheet(ds: Dataset) {
                 }
 
                 {
-                    const altNameEnglish = row['Name of damanged site in Ukrainian on Google Maps'];
+                    const altNameEnglish = row['Alternative English name on Google Maps'];
                     if (altNameEnglish) {
                         addQuad(namedNode('https://schema.org/alternateName'), literal(altNameEnglish, 'en'));
                     }

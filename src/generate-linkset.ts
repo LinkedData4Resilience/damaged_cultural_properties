@@ -47,7 +47,7 @@ export async function generateLinkset(account: Account, ds: Dataset) {
     } catch (_) {
         // probably doesn't exist yet
         await account.addQuery('link-damage-events-to-cultural-sites',
-            { 'dataset': ds, serviceType: 'speedy', queryString: linksetConstructionQuery })
+            { 'dataset': ds, serviceType: 'speedy', queryString: linksetConstructionQuery , accessLevel: 'public'})
     }
     const query = await account.getQuery('link-damage-events-to-cultural-sites');
 
