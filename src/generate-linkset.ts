@@ -40,16 +40,16 @@ construct {
   filter(?dist < 100) 
 }` as const;
 
-export async function generateLinkset(account: Account, ds: Dataset) {
+export async function generateLinkset(account: Account, ds: Dataset, queryName:string) {
 
     try {
-        await account.getQuery('link-damage-events-to-cultural-sites');
+        await account.getQuery(queryName);
     } catch (_) {
         // probably doesn't exist yet
-        await account.addQuery('link-damage-events-to-cultural-sites',
-            { 'dataset': ds, serviceType: 'speedy', queryString: linksetConstructionQuery , accessLevel: 'public'})
+        await account.addQuery(queryName,
+            { 'dataset': ds, serviceType: 'virtuoso', queryString: linksetConstructionQuery , accessLevel: 'public'})
     }
-    const query = await account.getQuery('link-damage-events-to-cultural-sites');
+    const query = await account.getQuery(queryName);
 
     const queryApi = await query.getRunLink()
 
