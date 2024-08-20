@@ -10,11 +10,20 @@ export default async function <T extends { [key: string]: any }>(csvPath: string
         fs.createReadStream(csvPath)
             .pipe(csv())
             .on('data', (row) => {
+                if (row[''].includes("in the")) return;
+                delete row[''];
+
+                const shouldInclude = row["Include or not (Yes/No)"];
+                if (!["Yes", "No"].includes(shouldInclude)) {
+                    console.warn(row)
+                    console.warn(`Unexpected value for bool: "${shouldInclude}"`);
+                    return;
+                }
+                if (shouldInclude === 'No'){
+                    return;
+                }
+                delete row["Include or not (Yes/No)"];
                 for (const key in row) {
-                    if (key === '') {
-                        // index column
-                        continue;
-                    }
                     if (!expectedHeaders.includes(key)) {
                         return reject(`Got unexpected key ${key} in ${csvPath}`);
                     }

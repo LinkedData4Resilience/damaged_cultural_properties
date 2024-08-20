@@ -13,18 +13,19 @@ prefix sdo: <https://schema.org/>
 prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 prefix owl: <http://www.w3.org/2002/07/owl#>
 construct {
-  ?damageEvent owl:sameAs ?cultureSiteDamage .
+  ?damageEvent <https://linked4resilience.eu/vocab/isCloseInLocationTo> ?cultureSiteDamage .
 } where {
 
   # graph pattern for a wkt literal of a cultural site damage event (newest data, july 2024)
-  ?cultureSiteDamage geo:asWKT ?wkt1 .
+  ?cultureSiteDamage geo:hasGeometry ?geo . 
+  ?geo geo:asWKT ?wkt1 .
   
   # graph pattern for damage events from previous work (2023)
   ?damageEvent a <http://semanticweb.cs.vu.nl/2009/11/sem/Event>.
   ?damageEvent sdo:location ?location .
-  ?location sdo:geo ?geo .
-  ?geo sdo:latitude ?latitude .
-  ?geo sdo:longitude ?longitude .
+  ?location sdo:geo ?geo2 .
+  ?geo2 sdo:latitude ?latitude .
+  ?geo2 sdo:longitude ?longitude .
   # construct a WKT literal from its geodata.   
   bind(
     strdt( concat('Point (',str(xsd:decimal(?longitude)),' ',str( xsd:decimal(?latitude)),')') , geo:wktLiteral)

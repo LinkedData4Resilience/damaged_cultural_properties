@@ -11,13 +11,19 @@ async function processSheet<T extends EtlConfig>(config: T) {
     const iri = config.iriGenerator();
     for (const header in row) {
       const processor = config.cellProcessors[header];
-      if (processor.when){
-        if (!processor.when(row[header])){
-          // skip
-          continue;
+      if ('statements' in processor){
+        store.addQuads(processor.statements(iri, config.graph, row[header]));
+      } else {
+        if (processor.when){
+          if (!processor.when(row[header])){
+            // skip
+            continue;
+          }
         }
+        const object = processor.object(row[header]);
+        if (!object.value.trim()) continue;
+        store.addQuad(iri, processor.predicate, object, config.graph);
       }
-      store.addQuad(iri, processor.predicate, processor.object(row[header]), config.graph);
     }
   }
   return store;
@@ -26,8 +32,8 @@ async function processSheet<T extends EtlConfig>(config: T) {
 async function run() {
 
   // db and query name can be adjusted to avoid overwriting exising resources. useful for testing. 
-  const dbName = 'cultural-sites-poc'; 
-  const queryName = 'link-damage-events-to-cultural-sites'
+  const dbName = 'cultural-sites-poc-v2';
+  const queryName = 'link-damage-events-to-cultural-sites-v2'
 
   // authenticate with triply
   const triply = TriplyClient.get({ token: process.env.TOKEN });
@@ -46,7 +52,7 @@ async function run() {
   // add earlier data about damage events
   await ds.importFromDataset(await account.getDataset('Integrated-CH-EoR-April-2023'));
 
-  await ds.ensureService('virtuoso', {type:'virtuoso'});
+  await (await ds.ensureService('virtuoso', {type:'virtuoso'})).waitUntilRunning();
 
   // refresh services, for updated data to run queries over
   for await (const service of ds.getServices()){
