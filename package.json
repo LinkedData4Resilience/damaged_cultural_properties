@@ -10,10 +10,12 @@
     "@triply/triplydb": "^8.0.7",
     "@types/fs-extra": "^11.0.4",
     "@types/n3": "^1.16.4",
+    "axios": "^1.7.4",
     "csv-parser": "^3.0.0",
     "fs-extra": "^11.2.0",
     "lpad": "^3.0.0",
     "n3": "^1.17.4",
+    "rdfxml-streaming-parser": "^2.4.0",
     "typescript": "^5.5.4"
   },
   "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"

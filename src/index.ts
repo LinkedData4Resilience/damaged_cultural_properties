@@ -1,8 +1,10 @@
 import TriplyClient from '@triply/triplydb';
-import configs, { EtlConfig } from './configs.js';
+import configs, { EtlConfig, regionCache } from './configs.js';
 import readSheets from './read-sheet.js';
 import { generateLinkset } from './generate-linkset.js';
 import { Store } from 'n3';
+import getGeonamesExcerpt from './get-geonames-excerpt.js';
+import Dataset from '@triply/triplydb/Dataset.js';
 
 async function processSheet<T extends EtlConfig>(config: T) {
   const data = await readSheets(config.inputFile, Object.keys(config.cellProcessors));
@@ -20,7 +22,7 @@ async function processSheet<T extends EtlConfig>(config: T) {
             continue;
           }
         }
-        const object = processor.object(row[header]);
+        const object = await processor.object(row[header]);
         if (!object.value.trim()) continue;
         store.addQuad(iri, processor.predicate, object, config.graph);
       }
@@ -30,6 +32,15 @@ async function processSheet<T extends EtlConfig>(config: T) {
 }
 
 async function run() {
+
+  console.info("Building UNESCO graph");
+  const unesco = await processSheet(configs.unesco)
+  console.info("Building Science-At-Risk graph");
+  const scienceAtRisk = await processSheet(configs.scienceAtRisk)
+  console.info("Building Geonames-Excerpt graph");
+  const geonames = await getGeonamesExcerpt(regionCache);
+
+  console.info("Connecting to Triplydb.com and setting up environment");
 
   // db and query name can be adjusted to avoid overwriting exising resources. useful for testing. 
   const dbName = 'cultural-sites-poc-v2';
@@ -44,23 +55,29 @@ async function run() {
   // make sure the dataset contains no data (its content is fully automated by this script)
   await ds.clear('graphs');
 
-  
-  // add data from both sheets
-  await ds.importFromStore(await processSheet(configs.unesco));
-  await ds.importFromStore(await processSheet(configs.scienceAtRisk));
+  console.info("Uploading the graphs we built");
+  await ds.importFromStore(unesco);
+  await ds.importFromStore(scienceAtRisk);
+  await ds.importFromStore(geonames);
 
-  // add earlier data about damage events
+  console.info("Importing data from our 2023 project")
   await ds.importFromDataset(await account.getDataset('Integrated-CH-EoR-April-2023'));
 
+  console.info("Setting up SPARQL query engine")
   await (await ds.ensureService('virtuoso', {type:'virtuoso'})).waitUntilRunning();
+  await refreshServices(ds);
 
-  // refresh services, for updated data to run queries over
-  for await (const service of ds.getServices()){
-    if (!await service.isUpToDate()) await service.update()
-  }
-
-  // generate linkset
+  console.info("Generate distance-based linkset between new graphs and our 2023 data, using SPARQL");
   await generateLinkset(account,ds, queryName);
+
+  await refreshServices(ds);
+}
+
+async function refreshServices(ds:Dataset){
+    // refresh services, for updated data to run queries over
+    for await (const service of ds.getServices()){
+      if (!await service.isUpToDate()) await service.update()
+    }
 }
 
 run().catch(e => {
