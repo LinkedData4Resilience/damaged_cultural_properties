@@ -13,11 +13,11 @@ async function processSheet<T extends EtlConfig>(config: T) {
     const iri = config.iriGenerator();
     for (const header in row) {
       const processor = config.cellProcessors[header];
-      if ('statements' in processor){
+      if ('statements' in processor) {
         store.addQuads(processor.statements(iri, config.graph, row[header]));
       } else {
-        if (processor.when){
-          if (!processor.when(row[header])){
+        if (processor.when) {
+          if (!processor.when(row[header])) {
             // skip
             continue;
           }
@@ -43,7 +43,7 @@ async function run() {
   console.info("Connecting to Triplydb.com and setting up environment");
 
   // db and query name can be adjusted to avoid overwriting exising resources. useful for testing. 
-  const dbName = 'cultural-sites-poc-v2';
+  const dbName = 'linked-4-resilience-2024';
   const queryName = 'link-damage-events-to-cultural-sites-v2'
 
   // authenticate with triply
@@ -61,23 +61,31 @@ async function run() {
   await ds.importFromStore(geonames);
 
   console.info("Importing data from our 2023 project")
-  await ds.importFromDataset(await account.getDataset('Integrated-CH-EoR-April-2023'));
+  await ds.importFromDataset(await account.getDataset('Integrated-CH-EoR-April-2023'), {
+    // we rename the graphs because the 2023 graph names carry no information and are confusing. 
+    graphMap: {
+      'https://triplydb.com/linked4resilience/Shelters-Kharkiv/graphs/default': 'https://linked4resilience.eu/graphs/kharkiv-shelters-2023',
+      'https://triplydb.com/linked4resilience/Integrated-CH-EoR-April-2023/graphs/default': 'https://linked4resilience.eu/graphs/eor-ch-linkset-2023',
+      'https://triplydb.com/linked4resilience/Integrated-CH-EoR-April-2023/graphs/default-1': 'https://linked4resilience.eu/graphs/eyes-on-russia-2023',
+      'https://triplydb.com/linked4resilience/Integrated-CH-EoR-April-2023/graphs/default-2': 'https://linked4resilience.eu/graphs/civilian-harm-2023',
+    }
+  });
 
   console.info("Setting up SPARQL query engine")
-  await (await ds.ensureService('virtuoso', {type:'virtuoso'})).waitUntilRunning();
+  await (await ds.ensureService('virtuoso', { type: 'virtuoso' })).waitUntilRunning();
   await refreshServices(ds);
 
   console.info("Generate distance-based linkset between new graphs and our 2023 data, using SPARQL");
-  await generateLinkset(account,ds, queryName);
+  await generateLinkset(account, ds, queryName);
 
   await refreshServices(ds);
 }
 
-async function refreshServices(ds:Dataset){
-    // refresh services, for updated data to run queries over
-    for await (const service of ds.getServices()){
-      if (!await service.isUpToDate()) await service.update()
-    }
+async function refreshServices(ds: Dataset) {
+  // refresh services, for updated data to run queries over
+  for await (const service of ds.getServices()) {
+    if (!await service.isUpToDate()) await service.update()
+  }
 }
 
 run().catch(e => {
