@@ -24,4 +24,4 @@ Contact:
 Eirik Kultorp (eirik@ekul.no) and Shuai Wang (shuai.wang@vu.nl)
 
 
-More about the project: linked4resilience.eu. 
+More about the project: [linked4resilience.eu](https://linked4resilience.eu/).
