@@ -20,6 +20,7 @@ filtered_data['YearMonth'] = filtered_data['EventDate'].dt.to_period('M')
 selected_types = [
     'https://linked4resilience.eu/data/library', 
     'https://linked4resilience.eu/data/museum', 
+    'https://linked4resilience.eu/data/education', 
     'https://linked4resilience.eu/data/religious-site'
 ]
 filtered_selected_data = filtered_data[filtered_data['EventType'].isin(selected_types)]
@@ -34,6 +35,7 @@ selected_grouped_data.plot(kind='line', marker='o', figsize=(6, 3))
 # Define a mapping from the old labels (URLs) to new labels
 label_mapping = {
     'https://linked4resilience.eu/data/library': 'Library',
+    'https://linked4resilience.eu/data/education': 'E&R',
     'https://linked4resilience.eu/data/museum': 'Museum',
     'https://linked4resilience.eu/data/religious-site': 'Religious sites'
 }
