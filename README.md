@@ -16,4 +16,12 @@ That dataset consists of 5 graphs, of which two are original. The other three ar
 
 New graphs:
  - [https://linked4resilience.eu/graphs/cultural-site-damage-events](https://triplydb.com/linked4resilience/cultural-sites-poc/table?graph=https%3A%2F%2Flinked4resilience.eu%2Fgraphs%2Fcultural-site-damage-events) : a linked-data version of the annotation spreadsheet
- - [https://linked4resilience.eu/graphs/cultural-sites-linkset](https://triplydb.com/linked4resilience/cultural-sites-poc/table?graph=https%3A%2F%2Flinked4resilience.eu%2Fgraphs%2Fcultural-sites-linkset) : a linkset between the new and old damage events, based on distance. 
+ - [https://linked4resilience.eu/graphs/cultural-sites-linkset](https://triplydb.com/linked4resilience/cultural-sites-poc/table?graph=https%3A%2F%2Flinked4resilience.eu%2Fgraphs%2Fcultural-sites-linkset) : a linkset between the new and old damage events, based on distance.
+
+Plot: you can find the files and code for plotting of use case 2 in the folder ./plot.
+
+Contact:
+Eirik Kultorp (eirik@ekul.no) and Shuai Wang (shuai.wang@vu.nl)
+
+
+More about the project: linked4resilience.eu. 
